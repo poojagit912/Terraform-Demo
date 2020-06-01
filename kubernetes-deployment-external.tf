@@ -1,8 +1,8 @@
-resource "kubernetes_deployment" "si-deployment" {
+resource "kubernetes_deployment" "external-deployment" {
   metadata {
-    name = "space-invaders-deployment"
+    name = "events-web"
     labels = {
-      App = "space-invaders"
+      App = "events-web"
     }
     namespace = kubernetes_namespace.n.metadata[0].name
   }
@@ -12,32 +12,35 @@ resource "kubernetes_deployment" "si-deployment" {
     progress_deadline_seconds = 60
     selector {
       match_labels = {
-        App = "space-invaders"
+        App = "events-web"
       }
     }
     template {
       metadata {
         labels = {
-          App = "space-invaders"
+          App = "events-web"
         }
       }
       spec {
         container {
-          image = "drehnstrom/space-invaders:latest"
-          name  = "space-invaders"
-
+          image = "poojadocker912/external:v3.0.0" 
+          name  = "events-web"
+          env {
+            name  = "SERVER"
+            value = "http://events-data-service:8082"
+          }          
           port {
-            container_port = 80
+            container_port = 8080
           }
 
           resources {
             limits {
-              cpu    = "0.2"
-              memory = "2562Mi"
+              cpu    = "0.5"
+              memory = "512Mi"
             }
             requests {
               cpu    = "0.1"
-              memory = "50Mi"
+              memory = "256Mi"
             }
           }
         }
